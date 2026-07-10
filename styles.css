@@ -156,6 +156,7 @@ body {
   z-index: 40;
   animation: pop .16s ease;
 }
+.menu-list[hidden] { display: none; }
 @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .menu-list button {
   text-align: left;
