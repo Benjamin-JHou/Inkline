@@ -1,0 +1,90 @@
+/* ============================================================
+   Inkline — 打印 / PDF 精排样式
+   通过 window.print() → "另存为 PDF"
+   仅打印预览正文，隐藏一切 UI。
+   ============================================================ */
+
+@page {
+  size: A4;
+  margin: 22mm 20mm;
+}
+
+@media print {
+  /* 强制浅色纸面输出，避免深色主题打出黑底 */
+  :root, [data-theme="dark"] {
+    --ink: #1c1a16;
+    --ink-soft: #4a463d;
+    --line: #ddd6c8;
+  }
+
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #1c1a16 !important;
+  }
+
+  /* 隐藏所有界面元素 */
+  .topbar, .statusbar, .divider, .pane-editor, .toast, .menu-list {
+    display: none !important;
+  }
+
+  .workspace {
+    display: block !important;
+    height: auto !important;
+  }
+  .pane-preview {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  .prose {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: "Newsreader", "Source Serif 4", Georgia, "Songti SC", serif;
+    font-size: 11.5pt;
+    line-height: 1.65;
+    color: #1c1a16;
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    color: #14120f;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  .prose h1 { font-size: 22pt; }
+  .prose h2 { font-size: 16pt; border-bottom: 1px solid #ddd6c8; }
+  .prose h3 { font-size: 13pt; }
+
+  .prose p, .prose li, .prose blockquote { orphans: 3; widows: 3; }
+
+  .prose pre, .prose blockquote, .prose table, .prose img, figure {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .prose pre {
+    background: #f6f3ec !important;
+    border: 1px solid #e0d9cb !important;
+    font-size: 9.5pt;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .prose code { background: #f2efe7 !important; border-color: #e0d9cb !important; }
+
+  .prose a { color: #1c1a16; border-bottom: 0; }
+  /* 展开链接地址便于纸面阅读 */
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: .78em;
+    color: #6b6558;
+    word-break: break-all;
+  }
+
+  .prose blockquote { border-left: 3px solid #b06b34; background: none !important; }
+  .prose th { background: #f2efe7 !important; }
+  .prose table, .prose th, .prose td { border-color: #ddd6c8 !important; }
+}
