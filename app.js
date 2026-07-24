@@ -44,6 +44,7 @@
       toast_installed: "Installed to home screen",
       import_title: "Open .md file",
       import:       "Import",
+      import_menu:  "Import .md",
       toast_imported: "File loaded: {name}",
       toast_import_fail: "Cannot read file",
       toast_import_type: "Please select a Markdown file (.md)",
@@ -88,6 +89,7 @@
       toast_installed: "已安装到桌面",
       import_title: "打开 .md 文件",
       import:       "导入",
+      import_menu:  "导入 .md",
       toast_imported: "已加载文件：{name}",
       toast_import_fail: "无法读取文件",
       toast_import_type: "请选择 Markdown 文件（.md）",
@@ -272,6 +274,16 @@ ${s.sample_end}`;
   fileInput.addEventListener("change", () => {
     if (fileInput.files.length) importFile(fileInput.files[0]);
   });
+
+  /* Import via Export dropdown menu (mobile) */
+  const menuImport = $("#menu-import");
+  if (menuImport) {
+    menuImport.addEventListener("click", () => {
+      closeMenu();
+      fileInput.value = "";
+      fileInput.click();
+    });
+  }
 
   /* Drag & drop onto editor pane */
   editorPane.addEventListener("dragover", (e) => {

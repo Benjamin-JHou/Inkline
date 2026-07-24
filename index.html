@@ -35,7 +35,7 @@
     </div>
 
     <div class="actions">
-      <input type="file" id="file-input" accept=".md,.markdown,.txt" hidden />
+      <input type="file" id="file-input" accept="text/plain,text/markdown,.md,.markdown,.txt" hidden />
       <button class="btn ghost" id="btn-lang" data-i18n-title="lang_title" title="切换语言 / Switch language" aria-label="Switch language">
         <span id="lang-label">中</span>
       </button>
@@ -49,6 +49,8 @@
       <div class="menu">
         <button class="btn primary" id="btn-export" data-i18n="export" aria-haspopup="true" aria-expanded="false">Export</button>
         <div class="menu-list" id="export-menu" role="menu" hidden>
+          <button role="menuitem" id="menu-import" data-i18n="import_menu" class="menu-import-item">Import .md</button>
+          <hr class="menu-divider" />
           <button role="menuitem" data-export="md" data-i18n="export_md">Markdown (.md)</button>
           <button role="menuitem" data-export="html" data-i18n="export_html">HTML (single file)</button>
           <button role="menuitem" data-export="pdf" data-i18n="export_pdf">PDF (print)</button>

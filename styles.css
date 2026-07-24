@@ -170,6 +170,9 @@ body {
   cursor: pointer;
 }
 .menu-list button:hover { background: var(--paper-sunken); color: var(--indigo); }
+.menu-import-item { color: var(--indigo) !important; font-weight: 500; }
+.menu-import-item:hover { background: color-mix(in srgb, var(--indigo) 10%, transparent) !important; }
+.menu-divider { border: 0; height: 1px; background: var(--line); margin: 4px 6px; }
 
 /* ---------- Workspace ---------- */
 .workspace {
@@ -348,6 +351,8 @@ body {
   .prose { font-size: 17px; }
   #editor { padding: 28px 20px 120px; }
   .brand-name { display: none; }
+  /* Hide standalone Import button on mobile — accessible via Export dropdown */
+  #btn-import { display: none; }
 }
 @media (min-width: 761px) {
   .tabs { display: none; }  /* desktop shows both panes, no tabs needed */
