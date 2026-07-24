@@ -433,6 +433,11 @@ body {
 [data-font="mono"] .prose h1 { font-size: 1.7em; }
 [data-font="mono"] .prose h2 { font-size: 1.3em; }
 
+/* ---------- Font overrides (editor textarea) ---------- */
+[data-font="serif"] #editor { font-family: var(--font-serif); font-size: 16px; }
+[data-font="sans"]  #editor { font-family: var(--font-ui);    font-size: 15px; }
+/* mono is the editor default — no override needed */
+
 /* ---------- Theme panel ---------- */
 #theme-menu-wrap { position: relative; }
 .theme-panel {
