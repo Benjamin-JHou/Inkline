@@ -351,8 +351,9 @@ body {
   .prose { font-size: 17px; }
   #editor { padding: 28px 20px 120px; }
   .brand-name { display: none; }
-  /* Hide standalone Import button on mobile — accessible via Export dropdown */
-  #btn-import { display: none; }
+  /* Icon-only mode on mobile: hide text labels, keep icons */
+  #btn-import .btn-label,
+  #btn-export  .btn-label { display: none; }
 }
 @media (min-width: 761px) {
   .tabs { display: none; }  /* desktop shows both panes, no tabs needed */
