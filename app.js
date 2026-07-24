@@ -18,8 +18,19 @@
   const langBtn   = $("#btn-lang");
 
   const STORAGE_KEY = "inkline.doc.v1";
-  const THEME_KEY   = "inkline.theme.v1";
+  const THEME_KEY   = "inkline.theme.v1";  // kept for migration only
   const LANG_KEY    = "inkline.lang.v1";
+  const PALETTE_KEY = "inkline.palette.v1";
+  const FONT_KEY    = "inkline.font.v1";
+
+  const PALETTES = {
+    paper:  { dark: false, meta: "#faf8f3" },
+    night:  { dark: true,  meta: "#1a1e24" },
+    sepia:  { dark: false, meta: "#f5f0e8" },
+    forest: { dark: true,  meta: "#141c18" },
+    dusk:   { dark: false, meta: "#f2f0f8" },
+    ocean:  { dark: true,  meta: "#0e1824" },
+  };
 
   /* ---------- i18n ---------- */
   const I18N = {
@@ -48,8 +59,13 @@
       toast_imported: "File loaded: {name}",
       toast_import_fail: "Cannot read file",
       toast_import_type: "Please select a Markdown file (.md)",
+      theme_title:  "Theme",
+      theme_color:  "Color",
+      theme_font:   "Font",
+      font_serif:   "Serif",
+      font_sans:    "Sans",
+      font_mono:    "Mono",
       lang_title:   "Switch language / 切换语言",
-      theme_title:  "Toggle theme",
       sample_title: "Welcome to Inkline",
       sample_body:  "*Between ink and paper, for writing alone.* Write on the left, see it typeset on the right in real time.",
       sample_h2:    "What it does",
@@ -93,8 +109,13 @@
       toast_imported: "已加载文件：{name}",
       toast_import_fail: "无法读取文件",
       toast_import_type: "请选择 Markdown 文件（.md）",
+      theme_title:  "主题",
+      theme_color:  "配色",
+      theme_font:   "字体",
+      font_serif:   "衬线",
+      font_sans:    "无衬线",
+      font_mono:    "等宽",
       lang_title:   "切换语言 / Switch language",
-      theme_title:  "切换主题",
       sample_title: "欢迎来到 Inkline",
       sample_body:  "*纸墨之间，只为写作。* 左侧书写，右侧即时成排。",
       sample_h2:    "它能做什么",
@@ -330,28 +351,76 @@ ${s.sample_end}`;
     });
   });
 
-  /* ---------- Theme ---------- */
+  /* ---------- Palette & Font ---------- */
   const lightCss = $("#hljs-light"), darkCss = $("#hljs-dark");
 
-  function applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.querySelector('meta[name="theme-color"]')
-      .setAttribute("content", theme === "dark" ? "#1a1e24" : "#faf8f3");
-    lightCss.disabled = theme === "dark";
-    darkCss.disabled  = theme !== "dark";
-    try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+  function applyPalette(name) {
+    if (!PALETTES[name]) name = "paper";
+    const p = PALETTES[name];
+    document.documentElement.setAttribute("data-palette", name);
+    document.documentElement.setAttribute("data-theme", p.dark ? "dark" : "light");
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", p.meta);
+    lightCss.disabled = p.dark;
+    darkCss.disabled  = !p.dark;
+    document.querySelectorAll(".swatch").forEach((s) => {
+      s.classList.toggle("is-active", s.dataset.palette === name);
+    });
+    try { localStorage.setItem(PALETTE_KEY, name); } catch (_) {}
   }
 
-  (function initTheme() {
-    let th = null;
-    try { th = localStorage.getItem(THEME_KEY); } catch (_) {}
-    if (!th) th = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    applyTheme(th);
+  function applyFont(name) {
+    if (!["serif", "sans", "mono"].includes(name)) name = "serif";
+    document.documentElement.setAttribute("data-font", name);
+    document.querySelectorAll(".font-btn").forEach((b) => {
+      b.classList.toggle("is-active", b.dataset.font === name);
+    });
+    try { localStorage.setItem(FONT_KEY, name); } catch (_) {}
+  }
+
+  (function initPalette() {
+    let p = null;
+    try { p = localStorage.getItem(PALETTE_KEY); } catch (_) {}
+    if (!p) {
+      // migrate from old theme key
+      try {
+        const old = localStorage.getItem(THEME_KEY);
+        if (old === "dark") p = "night";
+        else if (old === "light") p = "paper";
+      } catch (_) {}
+    }
+    if (!p) p = window.matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper";
+    applyPalette(p);
   })();
 
-  $("#btn-theme").addEventListener("click", () => {
-    const cur = document.documentElement.getAttribute("data-theme");
-    applyTheme(cur === "dark" ? "light" : "dark");
+  (function initFont() {
+    let f = null;
+    try { f = localStorage.getItem(FONT_KEY); } catch (_) {}
+    applyFont(f || "serif");
+  })();
+
+  /* Theme panel toggle */
+  const themePanel = $("#theme-panel");
+  const themeBtn   = $("#btn-theme");
+
+  function closeThemePanel() {
+    themePanel.hidden = true;
+    themeBtn.setAttribute("aria-expanded", "false");
+  }
+  themeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = themePanel.hidden;
+    themePanel.hidden = !open;
+    themeBtn.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", (e) => {
+    if (!themePanel.hidden && !e.target.closest("#theme-menu-wrap")) closeThemePanel();
+  });
+
+  document.querySelectorAll(".swatch").forEach((s) => {
+    s.addEventListener("click", () => applyPalette(s.dataset.palette));
+  });
+  document.querySelectorAll(".font-btn").forEach((b) => {
+    b.addEventListener("click", () => applyFont(b.dataset.font));
   });
 
   /* ---------- Toast ---------- */
