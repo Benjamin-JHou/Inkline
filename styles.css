@@ -281,6 +281,26 @@ body {
 .prose hr { border: 0; height: 1px; background: var(--line-strong); margin: 2.4em 0; }
 .prose img { max-width: 100%; border-radius: var(--radius); }
 
+/* ---------- Drag-over highlight ---------- */
+.pane-editor.drag-over {
+  position: relative;
+}
+.pane-editor.drag-over::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--indigo) 8%, transparent);
+  border: 2px dashed var(--indigo);
+  border-radius: var(--radius);
+  pointer-events: none;
+  animation: pulse-border .8s ease infinite alternate;
+  z-index: 10;
+}
+@keyframes pulse-border {
+  from { border-color: var(--indigo); }
+  to   { border-color: var(--ochre); }
+}
+
 /* ---------- Status bar ---------- */
 .statusbar {
   height: var(--status-h);

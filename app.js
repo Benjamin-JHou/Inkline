@@ -42,6 +42,11 @@
       toast_html:   "HTML exported",
       toast_pdf:    "Opening print dialog… choose «Save as PDF»",
       toast_installed: "Installed to home screen",
+      import_title: "Open .md file",
+      import:       "Import",
+      toast_imported: "File loaded: {name}",
+      toast_import_fail: "Cannot read file",
+      toast_import_type: "Please select a Markdown file (.md)",
       lang_title:   "Switch language / 切换语言",
       theme_title:  "Toggle theme",
       sample_title: "Welcome to Inkline",
@@ -81,6 +86,11 @@
       toast_html:   "已导出 HTML",
       toast_pdf:    "正在准备打印… 请在对话框中选择「另存为 PDF」",
       toast_installed: "已安装到桌面",
+      import_title: "打开 .md 文件",
+      import:       "导入",
+      toast_imported: "已加载文件：{name}",
+      toast_import_fail: "无法读取文件",
+      toast_import_type: "请选择 Markdown 文件（.md）",
       lang_title:   "切换语言 / Switch language",
       theme_title:  "切换主题",
       sample_title: "欢迎来到 Inkline",
@@ -235,6 +245,51 @@ ${s.sample_end}`;
     render();
   }
 
+  /* ---------- File import ---------- */
+  const fileInput  = $("#file-input");
+  const importBtn  = $("#btn-import");
+  const editorPane = $(".pane-editor");
+
+  function importFile(file) {
+    if (!file) return;
+    const ok = /\.(md|markdown|txt)$/i.test(file.name) || file.type === "text/markdown" || file.type === "text/plain";
+    if (!ok) { toast(t("toast_import_type")); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      editor.value = reader.result;
+      render();
+      persist();
+      toast(t("toast_imported").replace("{name}", file.name));
+    };
+    reader.onerror = () => toast(t("toast_import_fail"));
+    reader.readAsText(file);
+  }
+
+  importBtn.addEventListener("click", () => {
+    fileInput.value = "";   // allow re-selecting the same file
+    fileInput.click();
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) importFile(fileInput.files[0]);
+  });
+
+  /* Drag & drop onto editor pane */
+  editorPane.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    editorPane.classList.add("drag-over");
+  });
+  editorPane.addEventListener("dragleave", (e) => {
+    if (!editorPane.contains(e.relatedTarget)) {
+      editorPane.classList.remove("drag-over");
+    }
+  });
+  editorPane.addEventListener("drop", (e) => {
+    e.preventDefault();
+    editorPane.classList.remove("drag-over");
+    const file = e.dataTransfer.files[0];
+    if (file) importFile(file);
+  });
+
   /* ---------- Editor events ---------- */
   editor.addEventListener("input", () => { render(); persist(); });
 
@@ -249,6 +304,11 @@ ${s.sample_end}`;
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
       e.preventDefault();
       exportMarkdown();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "o") {
+      e.preventDefault();
+      fileInput.value = "";
+      fileInput.click();
     }
   });
 
