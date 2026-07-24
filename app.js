@@ -277,16 +277,6 @@ ${s.sample_end}`;
     if (fileInput.files.length) importFile(fileInput.files[0]);
   });
 
-  /* Import via Export dropdown menu (mobile) */
-  const menuImport = $("#menu-import");
-  if (menuImport) {
-    menuImport.addEventListener("click", () => {
-      closeMenu();
-      fileInput.value = "";
-      fileInput.click();
-    });
-  }
-
   /* Drag & drop onto editor pane */
   editorPane.addEventListener("dragover", (e) => {
     e.preventDefault();
