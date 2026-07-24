@@ -254,8 +254,10 @@ ${s.sample_end}`;
 
   function importFile(file) {
     if (!file) return;
-    const ok = /\.(md|markdown|txt)$/i.test(file.name) || file.type === "text/markdown" || file.type === "text/plain";
-    if (!ok) { toast(t("toast_import_type")); return; }
+    // iOS gives .md files an empty type — so we check extension first,
+    // then fall back to MIME type. Only hard-reject known binary formats.
+    const isBinary = /^(image|video|audio|application\/zip|application\/pdf)/.test(file.type);
+    if (isBinary) { toast(t("toast_import_type")); return; }
     const reader = new FileReader();
     reader.onload = () => {
       editor.value = reader.result;
