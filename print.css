@@ -76,13 +76,6 @@
   .prose code { background: #f2efe7 !important; border-color: #e0d9cb !important; }
 
   .prose a { color: #1c1a16; border-bottom: 0; }
-  /* 展开链接地址便于纸面阅读 */
-  .prose a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: .78em;
-    color: #6b6558;
-    word-break: break-all;
-  }
 
   .prose blockquote { border-left: 3px solid #b06b34; background: none !important; }
   .prose th { background: #f2efe7 !important; }

@@ -25,12 +25,16 @@
   const SPLIT_KEY   = "inkline.split.v1";  // editor pane width ratio + collapse state
 
   const PALETTES = {
-    paper:  { dark: false, meta: "#faf8f3" },
-    night:  { dark: true,  meta: "#1a1e24" },
-    sepia:  { dark: false, meta: "#f5f0e8" },
-    forest: { dark: true,  meta: "#141c18" },
-    dusk:   { dark: false, meta: "#f2f0f8" },
-    ocean:  { dark: true,  meta: "#0e1824" },
+    paper:      { dark: false, meta: "#faf8f3" },
+    night:      { dark: true,  meta: "#1a1e24" },
+    sepia:      { dark: false, meta: "#f5f0e8" },
+    forest:     { dark: true,  meta: "#141c18" },
+    dusk:       { dark: false, meta: "#f2f0f8" },
+    ocean:      { dark: true,  meta: "#0e1824" },
+    parchment:  { dark: false, meta: "#efe7d6" },
+    slate:      { dark: true,  meta: "#1b1d20" },
+    berry:      { dark: true,  meta: "#221726" },
+    sand:       { dark: false, meta: "#ece9e1" },
   };
 
   /* ---------- i18n ---------- */

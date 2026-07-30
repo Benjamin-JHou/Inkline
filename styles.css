@@ -126,6 +126,78 @@
   --shadow-md:    0 6px 22px rgba(0,0,0,.45);
 }
 
+/* ===== Palette: Parchment (light, warm aged) ===== */
+[data-palette="parchment"] {
+  --paper:        #efe7d6;
+  --paper-raised: #f7f0e1;
+  --paper-sunken: #e6dcc6;
+  --ink:          #3a2f1e;
+  --ink-soft:     #6b5b3e;
+  --ink-faint:    #9c8a68;
+  --line:         #d8caac;
+  --line-strong:  #c6b48f;
+  --indigo:       #7a5a2a;
+  --indigo-hi:    #94703a;
+  --ochre:        #a85a20;
+  --ochre-soft:   #c47838;
+  --shadow-sm:    0 1px 2px rgba(58,47,30,.07), 0 1px 3px rgba(58,47,30,.05);
+  --shadow-md:    0 4px 18px rgba(58,47,30,.13);
+}
+
+/* ===== Palette: Slate (dark, cool neutral) ===== */
+[data-palette="slate"] {
+  --paper:        #1b1d20;
+  --paper-raised: #24272b;
+  --paper-sunken: #141619;
+  --ink:          #e4e6ea;
+  --ink-soft:     #aab0b8;
+  --ink-faint:    #767d86;
+  --line:         #2e3237;
+  --line-strong:  #3a3f45;
+  --indigo:       #8a9bb4;
+  --indigo-hi:    #a4b4cc;
+  --ochre:        #d99a5e;
+  --ochre-soft:   #e6b07a;
+  --shadow-sm:    0 1px 2px rgba(0,0,0,.28);
+  --shadow-md:    0 6px 22px rgba(0,0,0,.4);
+}
+
+/* ===== Palette: Berry (dark, plum) ===== */
+[data-palette="berry"] {
+  --paper:        #221726;
+  --paper-raised: #2c2030;
+  --paper-sunken: #1a111e;
+  --ink:          #f0e2ec;
+  --ink-soft:     #c8a8c0;
+  --ink-faint:    #8e6e88;
+  --line:         #38243a;
+  --line-strong:  #46304a;
+  --indigo:       #c878d4;
+  --indigo-hi:    #dc98e6;
+  --ochre:        #e0a850;
+  --ochre-soft:   #f0c070;
+  --shadow-sm:    0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:    0 6px 22px rgba(0,0,0,.42);
+}
+
+/* ===== Palette: Sand (light, neutral beige) ===== */
+[data-palette="sand"] {
+  --paper:        #ece9e1;
+  --paper-raised: #f6f4ee;
+  --paper-sunken: #e2ded3;
+  --ink:          #2e2c26;
+  --ink-soft:     #5e5b50;
+  --ink-faint:    #918d80;
+  --line:         #d4cfc1;
+  --line-strong:  #c2bcae;
+  --indigo:       #5a6470;
+  --indigo-hi:    #727c88;
+  --ochre:        #b07a30;
+  --ochre-soft:   #c8964e;
+  --shadow-sm:    0 1px 2px rgba(46,44,38,.06), 0 1px 3px rgba(46,44,38,.04);
+  --shadow-md:    0 4px 18px rgba(46,44,38,.12);
+}
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
@@ -511,6 +583,7 @@ body.is-resizing .divider { pointer-events: auto !important; }
 }
 .palette-swatches {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 14px;
 }
