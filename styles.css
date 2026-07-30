@@ -323,7 +323,9 @@ body {
 .workspace {
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: var(--split-editor, 1fr) var(--split-divider, 7px) 1fr;
+  /* minmax(0, …) is essential: without it the editor's content forces a
+     minimum track width that prevents the "0fr" collapse from working. */
+  grid-template-columns: minmax(0, var(--split-editor, 1fr)) var(--split-divider, 7px) minmax(0, 1fr);
   min-height: 0;
 }
 
@@ -356,8 +358,18 @@ body {
 .divider:hover .divider-grip,
 .divider.is-active .divider-grip { background: var(--paper-raised); height: 46px; }
 
-/* Collapsed (editor hidden) state — show a thin tab to bring the editor back */
-.workspace.is-editor-collapsed .pane-editor { display: none; }
+/* Collapsed (editor hidden) state — show a thin tab to bring the editor back.
+   IMPORTANT: do NOT use display:none here. A display:none grid item is removed
+   from the grid, which reshuffles the remaining items and squeezes the preview
+   pane into the narrow divider track (text would vanish). Instead, keep the
+   editor item in the grid but zero its track + hide it visually. */
+.workspace.is-editor-collapsed .pane-editor {
+  min-width: 0;          /* allow the 0fr track to actually collapse */
+  width: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
 .workspace.is-editor-collapsed { --split-divider: 14px; }
 .workspace.is-editor-collapsed .divider { background: var(--paper-sunken); cursor: ew-resize; }
 .workspace.is-editor-collapsed .divider-grip {
@@ -625,7 +637,13 @@ body.is-resizing .divider { pointer-events: auto !important; }
   .workspace { grid-template-columns: 1fr !important; }
   .divider { display: none !important; }
   /* divider/resize is a desktop feature — reset any collapse state on mobile */
-  .workspace.is-editor-collapsed .pane-editor { display: block; }
+  .workspace.is-editor-collapsed .pane-editor {
+    display: block;
+    width: auto;
+    visibility: visible;
+    pointer-events: auto;
+    overflow: visible;
+  }
   .workspace.is-editor-collapsed { --split-divider: 7px; }
   .workspace[data-mode="write"] .pane-preview { display: none; }
   .workspace[data-mode="read"]  .pane-editor  { display: none; }
