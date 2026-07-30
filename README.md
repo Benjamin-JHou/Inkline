@@ -6,6 +6,7 @@ No download, no app store: open the link in a browser and install it to your hom
 ## Features
 
 - **Live preview** — write on the left, see it typeset on the right in real time (mobile uses a top "Write / Preview" tab switch)
+- **Resizable / hideable editor** — on desktop, drag the center divider to resize the editor pane, drag it to the far left (or double-click it) to hide the Markdown source and read the rendered preview full-width; click the collapsed tab to bring the editor back. The layout is remembered across sessions.
 - **Local-first** — content auto-saved in `localStorage`; works offline
 - **One-tap export**
   - `.md` — Markdown source file
@@ -68,3 +69,14 @@ inkline/
 
 - `Tab` — insert indentation
 - `⌘/Ctrl + S` — export Markdown
+
+## Desktop Divider
+
+The center divider between the editor and preview is interactive:
+
+- **Drag** — resize the editor pane (any ratio from narrow up to 80%)
+- **Double-click** — instantly hide the editor and read the rendered preview full-width
+- **Click the collapsed tab** (or drag it right) — bring the editor back
+- **Keyboard** (when divider is focused) — `←` / `→` to resize, `Enter` / `Space` to toggle
+
+The chosen width and hidden/visible state are saved locally and restored on the next visit. On mobile the app keeps its tab-based single-pane layout.

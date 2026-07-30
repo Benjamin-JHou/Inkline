@@ -1,5 +1,5 @@
 /* Inkline service worker — offline-first cache */
-const CACHE = "inkline-v1";
+const CACHE = "inkline-v2";
 const ASSETS = [
   "./",
   "./index.html",

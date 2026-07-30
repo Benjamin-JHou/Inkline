@@ -251,10 +251,56 @@ body {
 .workspace {
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  grid-template-columns: var(--split-editor, 1fr) var(--split-divider, 7px) 1fr;
   min-height: 0;
 }
-.divider { background: var(--line); }
+
+/* ---- Resizable / collapsible divider (desktop only) ---- */
+.divider {
+  position: relative;
+  background: var(--line);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background .15s ease;
+  touch-action: none;            /* let pointer events drive the drag on touch */
+}
+.divider:hover,
+.divider.is-active { background: var(--indigo); }
+.divider:focus-visible { outline: 0; background: var(--indigo); }
+
+/* center grip handle (visible hit-target affordance) */
+.divider-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: background .15s, transform .15s, height .15s;
+  pointer-events: none;
+}
+.divider:hover .divider-grip,
+.divider.is-active .divider-grip { background: var(--paper-raised); height: 46px; }
+
+/* Collapsed (editor hidden) state — show a thin tab to bring the editor back */
+.workspace.is-editor-collapsed .pane-editor { display: none; }
+.workspace.is-editor-collapsed { --split-divider: 14px; }
+.workspace.is-editor-collapsed .divider { background: var(--paper-sunken); cursor: ew-resize; }
+.workspace.is-editor-collapsed .divider-grip {
+  height: 60px;
+  width: 3px;
+  background: var(--ink-faint);
+}
+.workspace.is-editor-collapsed .divider:hover { background: var(--paper-sunken); }
+.workspace.is-editor-collapsed .divider:hover .divider-grip { background: var(--indigo); }
+
+/* While dragging, disable text selection and transitions for crisp feedback */
+body.is-resizing { cursor: col-resize !important; user-select: none !important; }
+body.is-resizing * { cursor: col-resize !important; pointer-events: none !important; }
+body.is-resizing .divider { pointer-events: auto !important; }
+
 .pane { min-height: 0; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
 .pane::-webkit-scrollbar { width: 10px; }
 .pane::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; border: 3px solid var(--paper); }
@@ -503,8 +549,11 @@ body {
 
 /* ---------- Responsive: single-pane on mobile ---------- */
 @media (max-width: 760px) {
-  .workspace { grid-template-columns: 1fr; }
-  .divider { display: none; }
+  .workspace { grid-template-columns: 1fr !important; }
+  .divider { display: none !important; }
+  /* divider/resize is a desktop feature — reset any collapse state on mobile */
+  .workspace.is-editor-collapsed .pane-editor { display: block; }
+  .workspace.is-editor-collapsed { --split-divider: 7px; }
   .workspace[data-mode="write"] .pane-preview { display: none; }
   .workspace[data-mode="read"]  .pane-editor  { display: none; }
   .prose { font-size: 17px; }

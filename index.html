@@ -85,7 +85,10 @@
         data-i18n-placeholder="placeholder"
         placeholder="# Start writing here&#10;&#10;Supports **Markdown**, `code`, tables, task lists…&#10;Everything you type is saved locally."></textarea>
     </section>
-    <div class="divider" aria-hidden="true"></div>
+    <div class="divider" id="divider" role="separator" aria-orientation="vertical" tabindex="0"
+         data-i18n-title="divider_title" title="Drag to resize editor · double-click to hide">
+      <span class="divider-grip" aria-hidden="true"></span>
+    </div>
     <section class="pane pane-preview" aria-label="Preview">
       <article id="preview" class="prose"></article>
     </section>

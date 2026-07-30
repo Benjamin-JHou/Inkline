@@ -22,6 +22,7 @@
   const LANG_KEY    = "inkline.lang.v1";
   const PALETTE_KEY = "inkline.palette.v1";
   const FONT_KEY    = "inkline.font.v1";
+  const SPLIT_KEY   = "inkline.split.v1";  // editor pane width ratio + collapse state
 
   const PALETTES = {
     paper:  { dark: false, meta: "#faf8f3" },
@@ -83,6 +84,8 @@
       sample_end:   "Now clear this text and write your own.",
       doc_default:  "inkline-document",
       lang_label_next: "中",
+      divider_title: "Drag to resize · double-click to hide editor",
+      divider_collapsed_title: "Click to show editor",
     },
     zh: {
       tab_write:    "写作",
@@ -133,6 +136,8 @@
       sample_end:   "现在清空这段文字，写下你自己的东西吧。",
       doc_default:  "inkline-文档",
       lang_label_next: "EN",
+      divider_title: "拖动可调整宽度 · 双击隐藏编辑区",
+      divider_collapsed_title: "点击显示编辑区",
     },
   };
 
@@ -350,6 +355,151 @@ ${s.sample_end}`;
       if (tab.dataset.view === "read") render();
     });
   });
+
+  /* ============================================================
+     Resizable & collapsible editor pane (desktop)
+     - Drag the divider to resize the editor width
+     - Drag it to the far left (or double-click) to hide the editor,
+       leaving the rendered preview full-width
+     - Click/drag back to reveal the editor again
+     - Ratio + collapsed state persist in localStorage
+     ============================================================ */
+  const dividerEl = $("#divider");
+  // Ratio of the editor pane width relative to the workspace width.
+  const MIN_RATIO = 0.12;   // editor becomes "collapsed" below this threshold
+  const COLLAPSE_RATIO = 0.06;
+  const MAX_RATIO = 0.80;
+  const DEFAULT_RATIO = 0.5;
+
+  let editorRatio = DEFAULT_RATIO;   // 0 < ratio <= MAX_RATIO
+  let editorCollapsed = false;
+
+  function applySplit() {
+    if (editorCollapsed) {
+      workspace.classList.add("is-editor-collapsed");
+      workspace.style.setProperty("--split-editor", "0fr");
+      workspace.style.setProperty("--split-divider", "14px");
+      dividerEl.setAttribute("title", t("divider_collapsed_title"));
+      dividerEl.setAttribute("aria-label", t("divider_collapsed_title"));
+    } else {
+      workspace.classList.remove("is-editor-collapsed");
+      workspace.style.setProperty("--split-editor", editorRatio + "fr");
+      workspace.style.setProperty("--split-divider", "7px");
+      dividerEl.setAttribute("title", t("divider_title"));
+      dividerEl.setAttribute("aria-label", t("divider_title"));
+    }
+  }
+
+  function persistSplit() {
+    try {
+      localStorage.setItem(SPLIT_KEY, JSON.stringify({
+        ratio: editorRatio, collapsed: editorCollapsed
+      }));
+    } catch (_) {}
+  }
+
+  function clampRatio(r) {
+    if (r < COLLAPSE_RATIO) return COLLAPSE_RATIO;  // actual collapse handled via flag
+    if (r > MAX_RATIO) return MAX_RATIO;
+    return r;
+  }
+
+  function startDrag(clientX) {
+    const rect = workspace.getBoundingClientRect();
+    document.body.classList.add("is-resizing");
+    dividerEl.classList.add("is-active");
+
+    const onMove = (ev) => {
+      const x = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+      let ratio = (x - rect.left) / rect.width;
+      ratio = clampRatio(ratio);
+      editorRatio = ratio;
+      // If dragged near the left edge, collapse the editor entirely.
+      const nowCollapsed = (x - rect.left) < rect.width * MIN_RATIO;
+      if (nowCollapsed !== editorCollapsed) {
+        editorCollapsed = nowCollapsed;
+      }
+      applySplit();
+    };
+    const endDrag = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", endDrag);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", endDrag);
+      document.body.classList.remove("is-resizing");
+      dividerEl.classList.remove("is-active");
+      persistSplit();
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", endDrag);
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend", endDrag);
+  }
+
+  dividerEl.addEventListener("mousedown", (e) => {
+    if (editorCollapsed) return;   // when collapsed, a plain click expands (handled below)
+    e.preventDefault();
+    startDrag(e.clientX);
+  });
+
+  /* Click the collapsed tab to reveal the editor again */
+  dividerEl.addEventListener("click", () => {
+    if (editorCollapsed) {
+      editorCollapsed = false;
+      editorRatio = DEFAULT_RATIO;
+      applySplit();
+      persistSplit();
+    }
+  });
+
+  /* Double-click toggles collapse (only when expanded) */
+  dividerEl.addEventListener("dblclick", () => {
+    if (editorCollapsed) return;
+    editorCollapsed = true;
+    applySplit();
+    persistSplit();
+  });
+
+  /* Keyboard support: arrow keys resize, Enter toggles collapse */
+  dividerEl.addEventListener("keydown", (e) => {
+    const step = 0.04;
+    if (e.key === "ArrowLeft") {
+      if (editorCollapsed) return;
+      e.preventDefault();
+      editorRatio = clampRatio(editorRatio - step);
+      if (editorRatio <= COLLAPSE_RATIO) editorCollapsed = true;
+      applySplit(); persistSplit();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      if (editorCollapsed) { editorCollapsed = false; editorRatio = DEFAULT_RATIO; }
+      else { editorRatio = clampRatio(editorRatio + step); }
+      applySplit(); persistSplit();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      editorCollapsed = !editorCollapsed;
+      if (!editorCollapsed && editorRatio <= COLLAPSE_RATIO) editorRatio = DEFAULT_RATIO;
+      applySplit(); persistSplit();
+    }
+  });
+
+  /* Restore saved split on load */
+  (function initSplit() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(SPLIT_KEY)); } catch (_) {}
+    if (saved && typeof saved === "object") {
+      if (typeof saved.ratio === "number" && saved.ratio > 0) editorRatio = clampRatio(saved.ratio);
+      if (typeof saved.collapsed === "boolean") editorCollapsed = saved.collapsed;
+    }
+    applySplit();
+  })();
+
+  /* Refresh the divider's localized title after a language switch
+     (it depends on collapse state, so it can't be a static data-i18n-title). */
+  const _origApplyLang = applyLang;
+  applyLang = function (newLang) {
+    _origApplyLang(newLang);
+    applySplit();
+  };
 
   /* ---------- Palette & Font ---------- */
   const lightCss = $("#hljs-light"), darkCss = $("#hljs-dark");
